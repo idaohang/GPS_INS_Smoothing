@@ -1,6 +1,6 @@
 % This script is for validate gps-ins smoothing only. 
 % No sliding window implemented.
-function [X_hat, traj, traj0, smth_out, ekf_out] = gps_smth_ins(Start_time, Buff_Size, state_out)
+function [X_hat, traj, smth_out, ekf_out] = gps_smth_ins(Start_time, Buff_Size, state_out)
 %clc;
 %clear;
 %close all;
@@ -23,8 +23,8 @@ else
     data.gps = read_GPS_buff_log(gps_data, Start_time, End_time);
 end
 
-%% Outlier Injection for multipath and outlier rejection research
-% data = gpsins_outlier_injection(data);
+%% 
+data = eraim_outlier_injection(data);
 
 %% Simulation setup
 % simulation parameters
@@ -47,7 +47,7 @@ ekf_out.Pxx = ones(N,p.X_STATES)*NaN;
 nav = gps_smth_init(data, p, Start_time);
 nav = gps_smth_buff_init(nav, Buff_Size);
 
-%% use EKF result as initial estimates of smoothing later
+% use EKF result as initial estimates of smoothing later
 for ii_imu = 1:N
     % perform one navigation iteration
     [nav, ekf_out] = gps_smth_step(p, nav, ii_imu, data, ekf_out, LOOSE);
@@ -83,6 +83,5 @@ Xhat_0 = [nav.buff.xhat_k0;nav.buff.xhat_k]; % save the initial estimates
 
 % Propagate whole trajectory
 traj = prop_whole_traj(nav, data, X_hat);
-traj0 = prop_whole_traj(nav, data, Xhat_0);
 
 

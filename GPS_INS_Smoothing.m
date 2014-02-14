@@ -12,18 +12,20 @@ global Dual_Freq;
 global Stationary;
 global Elev_Mask;
 global Sat_Num;
-Dual_Freq = 0;            % use dual freq meas or just single
-Stationary = 1;           % work on stationary data or on vehicle data
+Dual_Freq = 1;            % use dual freq meas or just single
+Stationary = 0;           % work on stationary data or on vehicle data
 Elev_Mask = 0;            % elevation mask in degree
 Sat_Num = 16;             % max number of satellite to use
 
-skipp = 25;                                      % skip the first xx seconds
+skipp = 50;                                      % skip the first xx seconds
 buff_size = 10;                                 % smoothing buffer size
 
 % for stationary
 true = [0.025, -5.931, 0.051]; % True Displacement between Ant1 and Ant2
 
-% Load data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Load Data %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global imu_data;
 global gps_data;
 if ~Stationary
@@ -32,9 +34,9 @@ if ~Stationary
     imu_data = imu_meas;
     gps_data = load('./Data_set/GPS_buff_log20140124_1728.dat');
     %gps_data = load('./Data_set/GPS_buff_log20140119_1042.dat');
-    gps_data(:,1) = gps_data(:,2); % fix time tag
-    %load('./Data_set/python_smooth.mat'); % smoothing result in state_out
+    gps_data(:,1) = gps_data(:,2); % fix time tag    
     load('./Data_set/Ahns_loop.mat'); % smoothing result in state_out
+    %load('./Data_set/python_smooth.mat'); % smoothing result in state_out
 else
     imu_data = load('./Data_set/IMU_buff_log_UCRStationary_1000s.dat');
     gps_data = load('./Data_set/GPS_buff_log_UCRStationary_1000s.dat');
@@ -63,14 +65,22 @@ else
     state_out_k = [];
 end
 
+%% You can run this section alone after loading the data. It could save time.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% State Estimation %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [Xhat, traj] = gps_smth_ins( start_time , buff_size, state_out_k );
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Result Processing and Plotting %%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 m = size(state_out_k);
 if m
     display('Sorry, due to time tag problem, no ground truth comparison in statistics for vehicle data temporarily.')
     figure(1);
     subplot(3,1,1);
-    plot(state_out_k(:,1), state_out_k(:,2), '.k', traj.t, traj.r_tb_t(:,1), '.b' );
+    plot(state_out_k(:,1), state_out_k(:,2), 'ko', traj.t, traj.r_tb_t(:,1), '.b' );
     title(['NED position'] );
     hold on;
     grid on;
@@ -84,11 +94,13 @@ if m
     plot(state_out_k(:,1), state_out_k(:,4), '.k', traj.t, traj.r_tb_t(:,3), '.b' );
     hold on;
     grid on;
+    legend('Ground Truth', 'Smoothing Result')
     ylabel('z (m)');
     xlabel('time (sec)')
     
     figure(2);
     plot(state_out_k(:,3), state_out_k(:,2), '.k', traj.r_tb_t(:,2), traj.r_tb_t(:,1), '.b' );
+    legend('Ground Truth', 'Smoothing Result')
     hold on;
     grid on;
     ylabel('North');

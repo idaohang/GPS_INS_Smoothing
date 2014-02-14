@@ -67,10 +67,10 @@ p.omega_it_t = [0; 0; 0];
 p.declination = 13*d2r;
 
 % noise parameters (we should measure these quantities!)
-% p.sigma_na = 1e-4;
-% p.sigma_nba = 1e-6;
-% p.sigma_ng = 0.00011636;
-% p.sigma_nbg = 1e-6;
+p.sigma_na = 1e-4;
+p.sigma_nba = 1e-6;
+p.sigma_ng = 0.00011636;
+p.sigma_nbg = 1e-6;
 % 
 % p.sigma_na = 1e-4;
 % p.sigma_nba = 5e-4;
@@ -82,10 +82,10 @@ p.declination = 13*d2r;
 % p.sigma_ng = 1.9e-5;
 % p.sigma_nbg = 5.0e-12;
 % 
-p.sigma_na = 5.0e-4;
-p.sigma_nba = 5.0e-6;
-p.sigma_ng = 5.0e-8;
-p.sigma_nbg = 5.0e-8;
+% p.sigma_na = 5.0e-4;
+% p.sigma_nba = 5.0e-6;
+% p.sigma_ng = 5.0e-8;
+% p.sigma_nbg = 5.0e-8;
 
 % identify correction types
 p = add_correction(p, 'GPS', 'm', 1, 'b', 1);
